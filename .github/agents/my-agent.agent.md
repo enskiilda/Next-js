@@ -14,4 +14,4 @@ absolutnie i bezwzględnie nie zachowuj w kodzie poprzedniej wersji kodu czy his
 
 nie waż się w żaden sposób edytować i modyfikować wyglądu designu ui
 
-całkowicie usuń usun backend pozostawiajac tylko frontend ui  i zmodyfikuj aplikacje by frontend dzialal w pelni i wyswietlal sie bez backendu
+całkowicie przekonwertuj z vite/sveltekit na next.js nie smieniajac nawet minimalnie design i wygladu frontendu ui
