@@ -12,7 +12,8 @@ import type { Awareness } from 'y-protocols/awareness';
 import type { SessionUser } from '$lib/stores';
 import { Editor, Extension } from '@tiptap/core';
 import { keymap } from 'prosemirror-keymap';
-import { tick } from 'svelte';
+
+const tick = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 
 const USER_COLORS = [
 	'#FF6B6B',
