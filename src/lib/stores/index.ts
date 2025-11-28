@@ -1,25 +1,109 @@
-import { create } from 'zustand';
-import { APP_NAME } from '@/lib/constants';
-import emojiShortCodes from '@/lib/emoji-shortcodes.json';
+import { APP_NAME } from '$lib/constants';
+import { type Writable, writable } from 'svelte/store';
+import type { ModelConfig } from '$lib/apis';
+import type { Banner } from '$lib/types';
+import type { Socket } from 'socket.io-client';
 
-// Pre-compute the short codes to emojis mapping
-const computedShortCodesToEmojis = Object.entries(emojiShortCodes).reduce((acc: Record<string, string>, [key, value]) => {
-	if (typeof value === 'string') {
-		acc[value] = key;
-	} else {
-		for (const v of value as string[]) {
-			acc[v] = key;
+import emojiShortCodes from '$lib/emoji-shortcodes.json';
+
+// Backend
+export const WEBUI_NAME = writable(APP_NAME);
+
+export const WEBUI_VERSION = writable(null);
+export const WEBUI_DEPLOYMENT_ID = writable(null);
+
+export const config: Writable<Config | undefined> = writable(undefined);
+export const user: Writable<SessionUser | undefined> = writable(undefined);
+
+// Electron App
+export const isApp = writable(false);
+export const appInfo = writable(null);
+export const appData = writable(null);
+
+// Frontend
+export const MODEL_DOWNLOAD_POOL = writable({});
+
+export const mobile = writable(false);
+
+export const socket: Writable<null | Socket> = writable(null);
+export const activeUserIds: Writable<null | string[]> = writable(null);
+export const USAGE_POOL: Writable<null | string[]> = writable(null);
+
+export const theme = writable('system');
+
+export const shortCodesToEmojis = writable(
+	Object.entries(emojiShortCodes).reduce((acc, [key, value]) => {
+		if (typeof value === 'string') {
+			acc[value] = key;
+		} else {
+			for (const v of value) {
+				acc[v] = key;
+			}
 		}
-	}
-	return acc;
-}, {});
+
+		return acc;
+	}, {})
+);
+
+export const TTSWorker = writable(null);
+
+export const chatId = writable('');
+export const chatTitle = writable('');
+
+export const channels = writable([]);
+export const chats = writable(null);
+export const pinnedChats = writable([]);
+export const tags = writable([]);
+export const folders = writable([]);
+
+export const selectedFolder = writable(null);
+
+export const models: Writable<Model[]> = writable([]);
+
+export const prompts: Writable<null | Prompt[]> = writable(null);
+export const knowledge: Writable<null | Document[]> = writable(null);
+export const tools = writable(null);
+export const functions = writable(null);
+
+export const toolServers = writable([]);
+
+export const banners: Writable<Banner[]> = writable([]);
+
+export const settings: Writable<Settings> = writable({});
+
+export const audioQueue = writable(null);
+
+export const showSidebar = writable(false);
+export const showSearch = writable(false);
+export const showSettings = writable(false);
+export const showShortcuts = writable(false);
+export const showArchivedChats = writable(false);
+export const showChangelog = writable(false);
+
+export const showControls = writable(false);
+export const showEmbeds = writable(false);
+export const showOverview = writable(false);
+export const showArtifacts = writable(false);
+export const showCallOverlay = writable(false);
+
+export const artifactCode = writable(null);
+export const artifactContents = writable(null);
+
+export const embed = writable(null);
+
+export const temporaryChatEnabled = writable(false);
+export const scrollPaginationEnabled = writable(false);
+export const currentChatPage = writable(1);
+
+export const isLastActiveTab = writable(true);
+export const playingNotificationSound = writable(false);
 
 export type Model = OpenAIModel | OllamaModel;
 
 type BaseModel = {
 	id: string;
 	name: string;
-	info?: any;
+	info?: ModelConfig;
 	owned_by: 'ollama' | 'openai' | 'arena';
 };
 
@@ -115,6 +199,7 @@ type Settings = {
 	splitLargeDeltas?: boolean;
 	chatDirection?: 'LTR' | 'RTL' | 'auto';
 	ctrlEnterToSend?: boolean;
+
 	system?: string;
 	seed?: number;
 	temperature?: string;
@@ -212,224 +297,3 @@ export type SessionUser = {
 	role: string;
 	profile_image_url: string;
 };
-
-export type Banner = {
-	id: string;
-	type: string;
-	title: string;
-	content: string;
-	dismissible: boolean;
-	timestamp: number;
-};
-
-interface AppState {
-	WEBUI_NAME: string;
-	setWEBUI_NAME: (name: string) => void;
-	WEBUI_VERSION: string | null;
-	setWEBUI_VERSION: (version: string | null) => void;
-	WEBUI_DEPLOYMENT_ID: string | null;
-	setWEBUI_DEPLOYMENT_ID: (id: string | null) => void;
-	config: Config | undefined;
-	setConfig: (config: any) => void;
-	user: SessionUser | undefined;
-	setUser: (user: any) => void;
-	isApp: boolean;
-	setIsApp: (isApp: boolean) => void;
-	appInfo: any;
-	setAppInfo: (info: any) => void;
-	appData: any;
-	setAppData: (data: any) => void;
-	MODEL_DOWNLOAD_POOL: Record<string, any>;
-	setMODEL_DOWNLOAD_POOL: (pool: Record<string, any>) => void;
-	mobile: boolean;
-	setMobile: (mobile: boolean) => void;
-	socket: any;
-	setSocket: (socket: any) => void;
-	activeUserIds: string[] | null;
-	setActiveUserIds: (ids: string[] | null) => void;
-	USAGE_POOL: string[] | null;
-	setUSAGE_POOL: (pool: string[] | null) => void;
-	theme: string;
-	setTheme: (theme: string) => void;
-	shortCodesToEmojis: Record<string, string>;
-	TTSWorker: any;
-	setTTSWorker: (worker: any) => void;
-	chatId: string;
-	setChatId: (id: string) => void;
-	chatTitle: string;
-	setChatTitle: (title: string) => void;
-	channels: any[];
-	setChannels: (channels: any[]) => void;
-	chats: any[] | null;
-	setChats: (chats: any[] | null) => void;
-	pinnedChats: any[];
-	setPinnedChats: (chats: any[]) => void;
-	tags: any[];
-	setTags: (tags: any[]) => void;
-	folders: any[];
-	setFolders: (folders: any[]) => void;
-	selectedFolder: any;
-	setSelectedFolder: (folder: any) => void;
-	models: Model[];
-	setModels: (models: Model[]) => void;
-	prompts: Prompt[] | null;
-	setPrompts: (prompts: Prompt[] | null) => void;
-	knowledge: Document[] | null;
-	setKnowledge: (knowledge: Document[] | null) => void;
-	tools: any;
-	setTools: (tools: any) => void;
-	functions: any;
-	setFunctions: (functions: any) => void;
-	toolServers: any[];
-	setToolServers: (servers: any[]) => void;
-	banners: Banner[];
-	setBanners: (banners: Banner[]) => void;
-	settings: Settings;
-	setSettings: (settings: Settings) => void;
-	audioQueue: any;
-	setAudioQueue: (queue: any) => void;
-	showSidebar: boolean;
-	setShowSidebar: (show: boolean) => void;
-	showSearch: boolean;
-	setShowSearch: (show: boolean) => void;
-	showSettings: boolean;
-	setShowSettings: (show: boolean) => void;
-	showShortcuts: boolean;
-	setShowShortcuts: (show: boolean) => void;
-	showArchivedChats: boolean;
-	setShowArchivedChats: (show: boolean) => void;
-	showChangelog: boolean;
-	setShowChangelog: (show: boolean) => void;
-	showControls: boolean;
-	setShowControls: (show: boolean) => void;
-	showEmbeds: boolean;
-	setShowEmbeds: (show: boolean) => void;
-	showOverview: boolean;
-	setShowOverview: (show: boolean) => void;
-	showArtifacts: boolean;
-	setShowArtifacts: (show: boolean) => void;
-	showCallOverlay: boolean;
-	setShowCallOverlay: (show: boolean) => void;
-	artifactCode: any;
-	setArtifactCode: (code: any) => void;
-	artifactContents: any;
-	setArtifactContents: (contents: any) => void;
-	embed: any;
-	setEmbed: (embed: any) => void;
-	temporaryChatEnabled: boolean;
-	setTemporaryChatEnabled: (enabled: boolean) => void;
-	scrollPaginationEnabled: boolean;
-	setScrollPaginationEnabled: (enabled: boolean) => void;
-	currentChatPage: number;
-	setCurrentChatPage: (page: number) => void;
-	isLastActiveTab: boolean;
-	setIsLastActiveTab: (isActive: boolean) => void;
-	playingNotificationSound: boolean;
-	setPlayingNotificationSound: (playing: boolean) => void;
-}
-
-export const useAppStore = create<AppState>((set) => ({
-	WEBUI_NAME: APP_NAME,
-	setWEBUI_NAME: (name) => set({ WEBUI_NAME: name }),
-	WEBUI_VERSION: null,
-	setWEBUI_VERSION: (version) => set({ WEBUI_VERSION: version }),
-	WEBUI_DEPLOYMENT_ID: null,
-	setWEBUI_DEPLOYMENT_ID: (id) => set({ WEBUI_DEPLOYMENT_ID: id }),
-	config: undefined,
-	setConfig: (config) => set({ config }),
-	user: undefined,
-	setUser: (user) => set({ user }),
-	isApp: false,
-	setIsApp: (isApp) => set({ isApp }),
-	appInfo: null,
-	setAppInfo: (info) => set({ appInfo: info }),
-	appData: null,
-	setAppData: (data) => set({ appData: data }),
-	MODEL_DOWNLOAD_POOL: {},
-	setMODEL_DOWNLOAD_POOL: (pool) => set({ MODEL_DOWNLOAD_POOL: pool }),
-	mobile: false,
-	setMobile: (mobile) => set({ mobile }),
-	socket: null,
-	setSocket: (socket) => set({ socket }),
-	activeUserIds: null,
-	setActiveUserIds: (ids) => set({ activeUserIds: ids }),
-	USAGE_POOL: null,
-	setUSAGE_POOL: (pool) => set({ USAGE_POOL: pool }),
-	theme: 'system',
-	setTheme: (theme) => set({ theme }),
-	shortCodesToEmojis: computedShortCodesToEmojis,
-	TTSWorker: null,
-	setTTSWorker: (worker) => set({ TTSWorker: worker }),
-	chatId: '',
-	setChatId: (id) => set({ chatId: id }),
-	chatTitle: '',
-	setChatTitle: (title) => set({ chatTitle: title }),
-	channels: [],
-	setChannels: (channels) => set({ channels }),
-	chats: null,
-	setChats: (chats) => set({ chats }),
-	pinnedChats: [],
-	setPinnedChats: (chats) => set({ pinnedChats: chats }),
-	tags: [],
-	setTags: (tags) => set({ tags }),
-	folders: [],
-	setFolders: (folders) => set({ folders }),
-	selectedFolder: null,
-	setSelectedFolder: (folder) => set({ selectedFolder: folder }),
-	models: [],
-	setModels: (models) => set({ models }),
-	prompts: null,
-	setPrompts: (prompts) => set({ prompts }),
-	knowledge: null,
-	setKnowledge: (knowledge) => set({ knowledge }),
-	tools: null,
-	setTools: (tools) => set({ tools }),
-	functions: null,
-	setFunctions: (functions) => set({ functions }),
-	toolServers: [],
-	setToolServers: (servers) => set({ toolServers: servers }),
-	banners: [],
-	setBanners: (banners) => set({ banners }),
-	settings: {},
-	setSettings: (settings) => set({ settings }),
-	audioQueue: null,
-	setAudioQueue: (queue) => set({ audioQueue: queue }),
-	showSidebar: false,
-	setShowSidebar: (show) => set({ showSidebar: show }),
-	showSearch: false,
-	setShowSearch: (show) => set({ showSearch: show }),
-	showSettings: false,
-	setShowSettings: (show) => set({ showSettings: show }),
-	showShortcuts: false,
-	setShowShortcuts: (show) => set({ showShortcuts: show }),
-	showArchivedChats: false,
-	setShowArchivedChats: (show) => set({ showArchivedChats: show }),
-	showChangelog: false,
-	setShowChangelog: (show) => set({ showChangelog: show }),
-	showControls: false,
-	setShowControls: (show) => set({ showControls: show }),
-	showEmbeds: false,
-	setShowEmbeds: (show) => set({ showEmbeds: show }),
-	showOverview: false,
-	setShowOverview: (show) => set({ showOverview: show }),
-	showArtifacts: false,
-	setShowArtifacts: (show) => set({ showArtifacts: show }),
-	showCallOverlay: false,
-	setShowCallOverlay: (show) => set({ showCallOverlay: show }),
-	artifactCode: null,
-	setArtifactCode: (code) => set({ artifactCode: code }),
-	artifactContents: null,
-	setArtifactContents: (contents) => set({ artifactContents: contents }),
-	embed: null,
-	setEmbed: (embed) => set({ embed }),
-	temporaryChatEnabled: false,
-	setTemporaryChatEnabled: (enabled) => set({ temporaryChatEnabled: enabled }),
-	scrollPaginationEnabled: false,
-	setScrollPaginationEnabled: (enabled) => set({ scrollPaginationEnabled: enabled }),
-	currentChatPage: 1,
-	setCurrentChatPage: (page) => set({ currentChatPage: page }),
-	isLastActiveTab: true,
-	setIsLastActiveTab: (isActive) => set({ isLastActiveTab: isActive }),
-	playingNotificationSound: false,
-	setPlayingNotificationSound: (playing) => set({ playingNotificationSound: playing }),
-}));

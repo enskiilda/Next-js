@@ -1,5 +1,5 @@
-import { WEBUI_API_BASE_URL } from '@/lib/constants';
-import { splitStream } from '@/lib/utils';
+import { WEBUI_API_BASE_URL } from '$lib/constants';
+import { splitStream } from '$lib/utils';
 
 export const uploadFile = async (token: string, file: File, metadata?: object | null) => {
 	const data = new FormData();
@@ -35,7 +35,7 @@ export const uploadFile = async (token: string, file: File, metadata?: object | 
 	if (res) {
 		const status = await getFileProcessStatus(token, res.id);
 
-		if (status && status.ok && status.body) {
+		if (status && status.ok) {
 			const reader = status.body
 				.pipeThrough(new TextDecoderStream())
 				.pipeThrough(splitStream('\n'))

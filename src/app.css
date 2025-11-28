@@ -1,4 +1,4 @@
-@import "./tailwind.css";
+@reference "./tailwind.css";
 
 @font-face {
 	font-family: 'Inter';
@@ -204,7 +204,7 @@ select {
 	color: #818286; /* Fallback color */
 }
 
-.dark .shimmer {
+:global(.dark) .shimmer {
 	background: linear-gradient(90deg, #818286 25%, #eae5e5 50%, #818286 75%);
 	background-size: 200% 100%;
 	background-clip: text;

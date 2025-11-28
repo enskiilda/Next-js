@@ -1,12 +1,5 @@
 export class AudioQueue {
-	audio: any;
-	queue: any[];
-	current: any;
-	id: any;
-	_onEnded: () => void;
-	onStopped: any;
-
-	constructor(audioElement: any) {
+	constructor(audioElement) {
 		this.audio = audioElement;
 		this.queue = [];
 		this.current = null;
@@ -18,7 +11,7 @@ export class AudioQueue {
 		this.onStopped = null; // optional callback
 	}
 
-	setId(newId: any) {
+	setId(newId) {
 		console.log('Setting audio queue ID to:', newId);
 		if (this.id !== newId) {
 			this.stop();
@@ -27,12 +20,12 @@ export class AudioQueue {
 		}
 	}
 
-	setPlaybackRate(rate: any) {
+	setPlaybackRate(rate) {
 		console.log('Setting audio playback rate to:', rate);
 		this.audio.playbackRate = rate;
 	}
 
-	enqueue(url: any) {
+	enqueue(url) {
 		console.log('Enqueuing audio URL:', url);
 		this.queue.push(url);
 

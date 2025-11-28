@@ -1,4 +1,4 @@
-import { OPENAI_API_BASE_URL, WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '@/lib/constants';
+import { OPENAI_API_BASE_URL, WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
 
 export const getOpenAIConfig = async (token: string = '') => {
 	let error = null;
@@ -267,7 +267,7 @@ export const getOpenAIModels = async (token: string, urlIdx?: number) => {
 
 export const verifyOpenAIConnection = async (
 	token: string = '',
-	connection: any = {},
+	connection: dict = {},
 	direct: boolean = false
 ) => {
 	const { url, key, config } = connection;
