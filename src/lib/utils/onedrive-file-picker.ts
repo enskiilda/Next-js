@@ -188,7 +188,6 @@ interface PickerParams {
 interface PickerResult {
 	command?: string;
 	items?: OneDriveFileInfo[];
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	[key: string]: any;
 }
 
@@ -235,7 +234,6 @@ interface OneDriveFileInfo {
 		driveId: string;
 	};
 	'@sharePoint.endpoint': string;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	[key: string]: any;
 }
 

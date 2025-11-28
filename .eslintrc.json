@@ -1,0 +1,9 @@
+{
+	"extends": "next/core-web-vitals",
+	"rules": {
+		"@next/next/no-img-element": "off",
+		"@next/next/no-css-tags": "off",
+		"import/no-anonymous-default-export": "off",
+		"@typescript-eslint/no-explicit-any": "off"
+	}
+}

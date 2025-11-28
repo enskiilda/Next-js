@@ -3,11 +3,11 @@ import { convertOpenApiToToolPayload } from '$lib/utils';
 import { getOpenAIModelsDirect } from './openai';
 
 import { parse } from 'yaml';
-import { toast } from 'svelte-sonner';
+import { toast } from 'sonner';
 
 export const getModels = async (
 	token: string = '',
-	connections: object | null = null,
+	connections: any = null,
 	base: boolean = false,
 	refresh: boolean = false
 ) => {
@@ -341,12 +341,12 @@ export const getToolServerData = async (token: string, url: string) => {
 	return res;
 };
 
-export const getToolServersData = async (servers: object[]) => {
+export const getToolServersData = async (servers: any[]) => {
 	return (
 		await Promise.all(
 			servers
-				.filter((server) => server?.config?.enable)
-				.map(async (server) => {
+				.filter((server: any) => server?.config?.enable)
+				.map(async (server: any) => {
 					let error = null;
 
 					let toolServerToken = null;
@@ -846,8 +846,10 @@ export const generateEmoji = async (
 	const response = res?.choices[0]?.message?.content.replace(/["']/g, '') ?? null;
 
 	if (response) {
-		if (/\p{Extended_Pictographic}/u.test(response)) {
-			return response.match(/\p{Extended_Pictographic}/gu)[0];
+		const emojiRegex = /[\uD83C-\uDBFF\uDC00-\uDFFF]+/;
+		if (emojiRegex.test(response)) {
+			const match = response.match(emojiRegex);
+			return match ? match[0] : null;
 		}
 	}
 
