@@ -13,8 +13,8 @@ export const AUDIO_API_BASE_URL = `${WEBUI_BASE_URL}/api/v1/audio`;
 export const IMAGES_API_BASE_URL = `${WEBUI_BASE_URL}/api/v1/images`;
 export const RETRIEVAL_API_BASE_URL = `${WEBUI_BASE_URL}/api/v1/retrieval`;
 
-export const WEBUI_VERSION = process.env.APP_VERSION || '0.6.40';
-export const WEBUI_BUILD_HASH = process.env.APP_BUILD_HASH || 'dev-build';
+export const WEBUI_VERSION = process.env.NEXT_PUBLIC_APP_VERSION || '0.6.40';
+export const WEBUI_BUILD_HASH = process.env.NEXT_PUBLIC_APP_BUILD_HASH || 'dev-build';
 export const REQUIRED_OLLAMA_VERSION = '0.1.16';
 
 export const SUPPORTED_FILE_TYPE = [

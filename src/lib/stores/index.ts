@@ -2,6 +2,18 @@ import { create } from 'zustand';
 import { APP_NAME } from '@/lib/constants';
 import emojiShortCodes from '@/lib/emoji-shortcodes.json';
 
+// Pre-compute the short codes to emojis mapping
+const computedShortCodesToEmojis = Object.entries(emojiShortCodes).reduce((acc: Record<string, string>, [key, value]) => {
+	if (typeof value === 'string') {
+		acc[value] = key;
+	} else {
+		for (const v of value as string[]) {
+			acc[v] = key;
+		}
+	}
+	return acc;
+}, {});
+
 export type Model = OpenAIModel | OllamaModel;
 
 type BaseModel = {
@@ -345,16 +357,7 @@ export const useAppStore = create<AppState>((set) => ({
 	setUSAGE_POOL: (pool) => set({ USAGE_POOL: pool }),
 	theme: 'system',
 	setTheme: (theme) => set({ theme }),
-	shortCodesToEmojis: Object.entries(emojiShortCodes).reduce((acc: Record<string, string>, [key, value]) => {
-		if (typeof value === 'string') {
-			acc[value] = key;
-		} else {
-			for (const v of value as string[]) {
-				acc[v] = key;
-			}
-		}
-		return acc;
-	}, {}),
+	shortCodesToEmojis: computedShortCodesToEmojis,
 	TTSWorker: null,
 	setTTSWorker: (worker) => set({ TTSWorker: worker }),
 	chatId: '',
