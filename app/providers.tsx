@@ -171,11 +171,6 @@ export function Providers({ children }: { children: ReactNode }) {
 
 		window.addEventListener('resize', handleResize);
 
-		const splashScreen = document.getElementById('splash-screen');
-		if (splashScreen) {
-			splashScreen.remove();
-		}
-
 		return () => {
 			window.removeEventListener('resize', handleResize);
 			document.removeEventListener('visibilitychange', handleVisibilityChange);
