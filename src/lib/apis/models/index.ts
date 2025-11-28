@@ -2,12 +2,12 @@ import { WEBUI_API_BASE_URL } from '@/lib/constants';
 
 export const getModelItems = async (
 	token: string = '',
-	query,
-	viewOption,
-	selectedTag,
-	orderBy,
-	direction,
-	page
+	query: any,
+	viewOption: any,
+	selectedTag: any,
+	orderBy: any,
+	direction: any,
+	page: any
 ) => {
 	let error = null;
 

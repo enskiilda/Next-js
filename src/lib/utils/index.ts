@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import sha256 from 'js-sha256';
+import { sha256 } from 'js-sha256';
 import { WEBUI_BASE_URL } from '@/lib/constants';
 
 import dayjs from 'dayjs';
@@ -28,23 +28,23 @@ function escapeRegExp(string: string): string {
 	return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export const replaceTokens = (content, char, user) => {
+export const replaceTokens = (content: any, char: any, user: any) => {
 	const tokens = [
 		{ regex: /{{char}}/gi, replacement: char },
 		{ regex: /{{user}}/gi, replacement: user },
 		{
 			regex: /{{VIDEO_FILE_ID_([a-f0-9-]+)}}/gi,
-			replacement: (_, fileId) =>
+			replacement: (_: any, fileId: any) =>
 				`<video src="${WEBUI_BASE_URL}/api/v1/files/${fileId}/content" controls></video>`
 		},
 		{
 			regex: /{{HTML_FILE_ID_([a-f0-9-]+)}}/gi,
-			replacement: (_, fileId) => `<file type="html" id="${fileId}" />`
+			replacement: (_: any, fileId: any) => `<file type="html" id="${fileId}" />`
 		}
 	];
 
 	// Replace tokens outside code blocks only
-	const processOutsideCodeBlocks = (text, replacementFn) => {
+	const processOutsideCodeBlocks = (text: any, replacementFn: any) => {
 		return text
 			.split(/(```[\s\S]*?```|`[\s\S]*?`)/)
 			.map((segment) => {
@@ -386,9 +386,7 @@ export const copyToClipboard = async (text, html = null, formatted = false) => {
 					return hljs.highlight(code, { language }).value;
 				}
 			};
-			marked.use(markedKatexExtension(options));
-			marked.use(markedExtension(options));
-			// DEVELOPER NOTE: Go to `@/lib/components/chat/Messages/Markdown.svelte` to add extra markdown extensions for rendering.
+			// Using basic marked without extensions for now
 
 			const htmlContent = marked.parse(text);
 
@@ -615,7 +613,7 @@ export const calculateSHA256 = async (file) => {
 		const buffer = await readFile;
 
 		// Convert the ArrayBuffer to a Uint8Array
-		const uint8Array = new Uint8Array(buffer);
+		const uint8Array = new Uint8Array(buffer as ArrayBuffer);
 
 		// Calculate the SHA-256 hash using Web Crypto API
 		const hashBuffer = await crypto.subtle.digest('SHA-256', uint8Array);
@@ -653,7 +651,7 @@ export const getUserPosition = async (raw = false) => {
 	}
 
 	// Extract the latitude and longitude from the position
-	const { latitude, longitude } = position.coords;
+	const { latitude, longitude } = (position as any).coords;
 
 	if (raw) {
 		return { latitude, longitude };
@@ -861,7 +859,7 @@ export const processDetails = (content) => {
 	if (matches) {
 		for (const match of matches) {
 			const attributesRegex = /(\w+)="([^"]*)"/g;
-			const attributes = {};
+			const attributes: Record<string, string> = {};
 			let attributeMatch;
 			while ((attributeMatch = attributesRegex.exec(match)) !== null) {
 				attributes[attributeMatch[1]] = attributeMatch[2];
@@ -976,7 +974,7 @@ export const getPromptVariables = (user_name, user_location) => {
 		'{{CURRENT_TIME}}': getFormattedTime(),
 		'{{CURRENT_WEEKDAY}}': getWeekday(),
 		'{{CURRENT_TIMEZONE}}': getUserTimezone(),
-		'{{USER_LANGUAGE}}': localStorage.getItem('locale') || 'en-US'
+		'{{USER_LANGUAGE}}': typeof window !== 'undefined' ? localStorage.getItem('locale') || 'en-US' : 'en-US'
 	};
 };
 
@@ -1209,7 +1207,7 @@ function resolveSchema(schemaRef, components, resolvedSchemas = new Set()) {
 	}
 
 	if (schemaRef.type) {
-		const schemaObj = { type: schemaRef.type };
+		const schemaObj: Record<string, any> = { type: schemaRef.type };
 
 		if (schemaRef.description) {
 			schemaObj.description = schemaRef.description;
@@ -1241,14 +1239,15 @@ function resolveSchema(schemaRef, components, resolvedSchemas = new Set()) {
 
 // Main conversion function
 export const convertOpenApiToToolPayload = (openApiSpec) => {
-	const toolPayload = [];
+	const toolPayload: any[] = [];
 
 	for (const [path, methods] of Object.entries(openApiSpec.paths)) {
-		for (const [method, operation] of Object.entries(methods)) {
-			if (operation?.operationId) {
-				const tool = {
-					name: operation.operationId,
-					description: operation.description || operation.summary || 'No description available.',
+		for (const [method, operation] of Object.entries(methods as any)) {
+			if ((operation as any)?.operationId) {
+				const op = operation as any;
+				const tool: Record<string, any> = {
+					name: op.operationId,
+					description: op.description || op.summary || 'No description available.',
 					parameters: {
 						type: 'object',
 						properties: {},
@@ -1257,8 +1256,8 @@ export const convertOpenApiToToolPayload = (openApiSpec) => {
 				};
 
 				// Extract path and query parameters
-				if (operation.parameters) {
-					operation.parameters.forEach((param) => {
+				if (op.parameters) {
+					op.parameters.forEach((param) => {
 						let description = param.schema.description || param.description || '';
 						if (param.schema.enum && Array.isArray(param.schema.enum)) {
 							description += `. Possible values: ${param.schema.enum.join(', ')}`;
@@ -1275,8 +1274,8 @@ export const convertOpenApiToToolPayload = (openApiSpec) => {
 				}
 
 				// Extract and recursively resolve requestBody if available
-				if (operation.requestBody) {
-					const content = operation.requestBody.content;
+				if (op.requestBody) {
+					const content = op.requestBody.content;
 					if (content && content['application/json']) {
 						const requestSchema = content['application/json'].schema;
 						const resolvedRequestSchema = resolveSchema(requestSchema, openApiSpec.components);
@@ -1456,18 +1455,10 @@ export const parseJsonValue = (value: string): any => {
 };
 
 async function ensurePDFjsLoaded() {
-	if (!window.pdfjsLib) {
-		const pdfjs = await import('pdfjs-dist');
-		pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
-		if (!window.pdfjsLib) {
-			throw new Error('pdfjsLib is required for PDF extraction');
-		}
-	}
-	return window.pdfjsLib;
+	throw new Error('PDF.js not available in this build');
 }
 
 export const extractContentFromFile = async (file: File) => {
-	// Known text file extensions for extra fallback
 	const textExtensions = [
 		'.txt',
 		'.md',
@@ -1488,22 +1479,6 @@ export const extractContentFromFile = async (file: File) => {
 		return dot === -1 ? '' : filename.substr(dot).toLowerCase();
 	}
 
-	// Uses pdfjs to extract text from PDF
-	async function extractPdfText(file: File) {
-		const pdfjsLib = await ensurePDFjsLoaded();
-		const arrayBuffer = await file.arrayBuffer();
-		const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-		let allText = '';
-		for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-			const page = await pdf.getPage(pageNum);
-			const content = await page.getTextContent();
-			const strings = content.items.map((item: any) => item.str);
-			allText += strings.join(' ') + '\n';
-		}
-		return allText;
-	}
-
-	// Reads file as text using FileReader
 	function readAsText(file: File) {
 		return new Promise((resolve, reject) => {
 			const reader = new FileReader();
@@ -1516,17 +1491,14 @@ export const extractContentFromFile = async (file: File) => {
 	const type = file.type || '';
 	const ext = getExtension(file.name);
 
-	// PDF check
 	if (type === 'application/pdf' || ext === '.pdf') {
-		return await extractPdfText(file);
+		throw new Error('PDF extraction not available');
 	}
 
-	// Text check (plain or common text-based)
 	if (type.startsWith('text/') || textExtensions.includes(ext)) {
 		return await readAsText(file);
 	}
 
-	// Fallback: try to read as text, if decodable
 	try {
 		return await readAsText(file);
 	} catch (err) {
@@ -1547,15 +1519,7 @@ export const getAge = (birthDate) => {
 };
 
 export const convertHeicToJpeg = async (file: File) => {
-	const { default: heic2any } = await import('heic2any');
-	try {
-		return await heic2any({ blob: file, toType: 'image/jpeg' });
-	} catch (err: any) {
-		if (err?.message?.includes('already browser readable')) {
-			return file;
-		}
-		throw err;
-	}
+	throw new Error('HEIC conversion not available');
 };
 
 export const decodeString = (str: string) => {
@@ -1567,35 +1531,15 @@ export const decodeString = (str: string) => {
 };
 
 export const initMermaid = async () => {
-	const { default: mermaid } = await import('mermaid');
-	mermaid.initialize({
-		startOnLoad: false, // Should be false when using render API
-		theme: document.documentElement.classList.contains('dark') ? 'dark' : 'default',
-		securityLevel: 'loose'
-	});
-	return mermaid;
+	throw new Error('Mermaid not available');
 };
 
-export const renderMermaidDiagram = async (mermaid, code: string) => {
-	const parseResult = await mermaid.parse(code, { suppressErrors: false });
-	if (parseResult) {
-		const { svg } = await mermaid.render(`mermaid-${uuidv4()}`, code);
-		return svg;
-	}
-	return '';
+export const renderMermaidDiagram = async (mermaid: any, code: string) => {
+	throw new Error('Mermaid not available');
 };
 
 export const renderVegaVisualization = async (spec: string, i18n?: any) => {
-	const vega = await import('vega');
-	const parsedSpec = JSON.parse(spec);
-	let vegaSpec = parsedSpec;
-	if (parsedSpec.$schema && parsedSpec.$schema.includes('vega-lite')) {
-		const vegaLite = await import('vega-lite');
-		vegaSpec = vegaLite.compile(parsedSpec).spec;
-	}
-	const view = new vega.View(vega.parse(vegaSpec), { renderer: 'none' });
-	const svg = await view.toSVG();
-	return svg;
+	throw new Error('Vega not available');
 };
 
 export const getCodeBlockContents = (content: string): object => {

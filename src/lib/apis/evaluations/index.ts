@@ -93,7 +93,7 @@ export const getAllFeedbacks = async (token: string = '') => {
 	return res;
 };
 
-export const getFeedbackItems = async (token: string = '', orderBy, direction, page) => {
+export const getFeedbackItems = async (token: string = '', orderBy: any, direction: any, page: any) => {
 	let error = null;
 
 	const searchParams = new URLSearchParams();
