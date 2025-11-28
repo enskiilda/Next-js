@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import sha256 from 'js-sha256';
-import { WEBUI_BASE_URL } from '$lib/constants';
+import { WEBUI_BASE_URL } from '@/lib/constants';
 
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -13,13 +13,9 @@ dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 dayjs.extend(localizedFormat);
 
-import { TTS_RESPONSE_SPLIT } from '$lib/types';
-
-import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
+import { TTS_RESPONSE_SPLIT } from '@/lib/types';
 
 import { marked } from 'marked';
-import markedExtension from '$lib/utils/marked/extension';
-import markedKatexExtension from '$lib/utils/marked/katex-extension';
 import hljs from 'highlight.js';
 
 //////////////////////////
@@ -392,7 +388,7 @@ export const copyToClipboard = async (text, html = null, formatted = false) => {
 			};
 			marked.use(markedKatexExtension(options));
 			marked.use(markedExtension(options));
-			// DEVELOPER NOTE: Go to `$lib/components/chat/Messages/Markdown.svelte` to add extra markdown extensions for rendering.
+			// DEVELOPER NOTE: Go to `@/lib/components/chat/Messages/Markdown.svelte` to add extra markdown extensions for rendering.
 
 			const htmlContent = marked.parse(text);
 

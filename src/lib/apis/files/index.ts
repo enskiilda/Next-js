@@ -1,5 +1,5 @@
-import { WEBUI_API_BASE_URL } from '$lib/constants';
-import { splitStream } from '$lib/utils';
+import { WEBUI_API_BASE_URL } from '@/lib/constants';
+import { splitStream } from '@/lib/utils';
 
 export const uploadFile = async (token: string, file: File, metadata?: object | null) => {
 	const data = new FormData();

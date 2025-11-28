@@ -1,5 +1,5 @@
-import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
-import type { Banner } from '$lib/types';
+import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '@/lib/constants';
+import type { Banner } from '@/lib/types';
 
 export const importConfig = async (token: string, config) => {
 	let error = null;

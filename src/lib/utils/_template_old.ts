@@ -1,4 +1,4 @@
-import { titleGenerationTemplate } from '$lib/utils/index';
+import { titleGenerationTemplate } from '@/lib/utils/index';
 import { expect, test } from 'vitest';
 
 test('titleGenerationTemplate correctly replaces {{prompt}} placeholder', () => {

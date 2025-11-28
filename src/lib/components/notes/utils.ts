@@ -1,7 +1,7 @@
 import DOMPurify from 'dompurify';
-import { toast } from 'svelte-sonner';
+import { toast } from 'sonner';
 
-import { createNewNote } from '$lib/apis/notes';
+import { createNewNote } from '@/lib/apis/notes';
 
 export const downloadPdf = async (note) => {
 	const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
